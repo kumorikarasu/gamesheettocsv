@@ -13,7 +13,7 @@ const TOKEN_PATH = 'token.json';
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), listMajors);
+  authorize(JSON.parse(content), displayCSV);
 });
 
 /**
@@ -66,12 +66,9 @@ function getNewToken(oAuth2Client, callback) {
   });
 }
 
-/**
- * Prints the names and majors of students in a sample spreadsheet:
- * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
- */
-function listMajors(auth) {
+
+// Display the google sheet as a correctly formated csv file that can be imported into photoshop
+function displayCSV(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   sheets.spreadsheets.values.get({
     spreadsheetId: '1AHcpsEo5qBInR1NvNgiCbI5jYgiyOYE4Z1uarlYBboI',
@@ -81,10 +78,11 @@ function listMajors(auth) {
     const rows = res.data.values;
     // Head
     console.log(rows[0].join(','));
-    // Values
     rows.slice(1).map((row) => {
+      // Values
       // name,background,top,bot,buy1vis,buy1,buy2vis,buy2,buy3vis,buy3,buy4vis,buy4,buy5vis,buy5,top1vis,top1,top2vis,top2,top3vis,top3,top4vis,top4,top5vis,top5,bottom1vis,bottom1,bottom2vis,bottom2,bottom3vis,bottom3,bottom4vis,bottom4,bottom5vis,bottom5
       console.log(`"${row[0]}",${row[1]},"${row[2]}","${row[3]}",${row.slice(4).join(',')}`)
     });
   });
 }
+
